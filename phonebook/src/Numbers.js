@@ -11,6 +11,7 @@ const Numbers = ({ data, nameFilter }) => {
             </p>
           );
         }
+        return null;
       })}
     </div>
   );
