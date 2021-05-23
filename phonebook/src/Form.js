@@ -5,10 +5,10 @@ const Form = ({ onSubmit, onChange, numberChange, newName, newNumber }) => {
     <div>
       <form onSubmit={onSubmit}>
         <div>
-          name: <input value={newName} onChange={onChange} required />
+          Name: <input value={newName} onChange={onChange} required />
         </div>
         <div>
-          number:{" "}
+          Number:{" "}
           <input
             type="number"
             value={newNumber}

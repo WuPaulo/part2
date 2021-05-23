@@ -3,12 +3,16 @@ import noteService from "./services/notes";
 import Form from "./Form";
 import Filter from "./Filter";
 import Numbers from "./Numbers";
+import Notification from "./Notification";
+import "./index.css";
 
 const App = () => {
   const [notes, setNotes] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [nameFilter, setNameFilter] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessages, setErrorMessages] = useState(null);
 
   const noteObject = {};
 
@@ -32,19 +36,35 @@ const App = () => {
     if (!duplicate) {
       noteService.create(noteObject).then((response) => {
         setNotes(notes.concat(response.data));
+        setNewName("");
+        setNewNumber("");
+        setErrorMessage(`Added ${newName}`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 3000);
       });
     } else {
       if (
         window.confirm(
-          `is already added to the phonebook, replace the old number with a new one?`
+          `${newName} is already added to the phonebook, replace the old number with a new one?`
         )
       ) {
-        console.log("add this");
         const index = notes.findIndex((x) => x.name === newName);
         noteService.update(notes[index].id, noteObject).then((response) => {
-          noteService.getAll().then((response) => {
-            setNotes(response.data);
-          });
+          noteService
+            .getAll()
+            .then((response) => {
+              setNotes(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+              setErrorMessages(
+                `Note '${notes.content}' was already removed from server`
+              );
+              setTimeout(() => {
+                setErrorMessages(null);
+              }, 5000);
+            });
         });
       }
       setNewName("");
@@ -67,8 +87,9 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} errorMessage={errorMessages} />
       <Filter value={nameFilter} onChange={filterChange} />
-      <h2>add a new</h2>
+      <h2>Add a new</h2>
       <Form
         onSubmit={addNote}
         onChange={onChange}
