@@ -34,10 +34,22 @@ const App = () => {
         setNotes(notes.concat(response.data));
       });
     } else {
-      window.alert(`${newName} is already added to the phonebook`);
+      if (
+        window.confirm(
+          `is already added to the phonebook, replace the old number with a new one?`
+        )
+      ) {
+        console.log("add this");
+        const index = notes.findIndex((x) => x.name === newName);
+        noteService.update(notes[index].id, noteObject).then((response) => {
+          noteService.getAll().then((response) => {
+            setNotes(response.data);
+          });
+        });
+      }
+      setNewName("");
+      setNewNumber("");
     }
-    setNewName("");
-    setNewNumber("");
   };
 
   const onChange = (e) => {
