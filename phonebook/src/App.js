@@ -20,12 +20,6 @@ const App = () => {
 
   const addNote = (e) => {
     e.preventDefault();
-    const duplicate = notes.some((i) => i.name.includes(newName));
-    if (!duplicate) {
-      setNotes(notes.concat({ name: newName, number: newNumber }));
-    } else {
-      window.alert(`${newName} is already added to the phonebook`);
-    }
 
     const noteObject = {
       name: newName,
@@ -34,11 +28,16 @@ const App = () => {
       important: Math.random() < 0.5,
     };
 
-    noteService.create(noteObject).then((response) => {
-      setNotes(notes.concat(response.data));
-      setNewName("");
-      setNewNumber("");
-    });
+    const duplicate = notes.some((i) => i.name.includes(newName));
+    if (!duplicate) {
+      noteService.create(noteObject).then((response) => {
+        setNotes(notes.concat(response.data));
+      });
+    } else {
+      window.alert(`${newName} is already added to the phonebook`);
+    }
+    setNewName("");
+    setNewNumber("");
   };
 
   const onChange = (e) => {
@@ -66,7 +65,12 @@ const App = () => {
         newNumber={newNumber}
       />
       <h2>Numbers</h2>
-      <Numbers data={notes} nameFilter={nameFilter} noteObject={noteObject} />
+      <Numbers
+        data={notes}
+        nameFilter={nameFilter}
+        noteObject={noteObject}
+        setNotes={setNotes}
+      />
     </div>
   );
 };

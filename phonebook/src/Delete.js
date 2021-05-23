@@ -1,10 +1,15 @@
 import React from "react";
 import noteService from "./services/notes";
 
-const Delete = ({ id, noteObject }) => {
+const Delete = ({ name, id, noteObject, setNotes }) => {
   const deleteNote = () => {
-    console.log("worked");
-    noteService.deleteNote(id, noteObject).then((response) => {});
+    if (window.confirm(`Delete ${name}`)) {
+      noteService.deleteNote(id, noteObject).then((response) => {
+        noteService.getAll().then((response) => {
+          setNotes(response.data);
+        });
+      });
+    }
   };
   return <button onClick={deleteNote}>delete</button>;
 };
