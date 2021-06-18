@@ -1,5 +1,5 @@
+import getPersons from "./services/getPersons";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Filter from "./Filter";
 import Form from "./Form";
 import Persons from "./Persons";
@@ -13,9 +13,8 @@ const App = () => {
 
   useEffect(() => {
     console.log("effect");
-    axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("promise fulfilled");
-      setPersons(response.data);
+    getPersons.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
     });
   }, []);
   console.log("render", persons.length, "persons");
@@ -27,11 +26,9 @@ const App = () => {
 
     if (!duplicate) {
       const personObj = { name: newName, number: newNumber };
-      axios
-        .post("http://localhost:3001/persons", personObj)
-        .then((response) => {
-          setPersons(persons.concat(response.data));
-        });
+      getPersons.create(personObj).then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+      });
     } else {
       alert(`${newName} is already added to phonebook`);
     }
@@ -56,6 +53,18 @@ const App = () => {
     );
   };
 
+  const deleteClick = (personTobeDeleted) => {
+    if (window.confirm(`Delete ${personTobeDeleted.name} ?`)) {
+      getPersons
+        .deleteObjectById(personTobeDeleted.id)
+        .then(
+          setPersons(
+            persons.filter((person) => person.id !== personTobeDeleted.id)
+          )
+        );
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -70,9 +79,9 @@ const App = () => {
       />
       <h2>Numbers</h2>
       {nameFilter.length > 0 ? (
-        <Persons persons={filteredName}></Persons>
+        <Persons persons={filteredName} deleteClick={deleteClick}></Persons>
       ) : (
-        <Persons persons={persons}></Persons>
+        <Persons persons={persons} deleteClick={deleteClick}></Persons>
       )}
     </div>
   );
