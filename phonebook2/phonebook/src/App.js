@@ -12,26 +12,42 @@ const App = () => {
   const [filteredName, setFilteredName] = useState([]);
 
   useEffect(() => {
-    console.log("effect");
     getPersons.getAll().then((initialPersons) => {
       setPersons(initialPersons);
     });
   }, []);
-  console.log("render", persons.length, "persons");
 
   const addPerson = (e) => {
     e.preventDefault();
 
-    const duplicate = persons.some((i) => i.name.includes(newName));
+    const duplicate = persons.some((i) =>
+      i.name.toLowerCase().includes(newName.toLowerCase())
+    );
 
     if (!duplicate) {
       const personObj = { name: newName, number: newNumber };
       getPersons.create(personObj).then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson));
       });
-    } else {
-      alert(`${newName} is already added to phonebook`);
+    } else if (duplicate) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const index = persons.find((person) => person.name === newName);
+        const indexPerson = { ...index, number: newNumber };
+        console.log(index.id);
+        getPersons.update(index.id, indexPerson).then((returnedPerson) => {
+          setPersons(
+            persons.map((person) =>
+              person.id !== index.id ? person : returnedPerson
+            )
+          );
+        });
+      }
     }
+
     setNewName("");
     setNewNumber("");
   };

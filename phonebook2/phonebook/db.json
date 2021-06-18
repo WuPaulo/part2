@@ -2,12 +2,12 @@
   "persons": [
     {
       "name": "Arto Hellas",
-      "number": "040-123456",
+      "number": "1131324",
       "id": 1
     },
     {
       "name": "Ada Lovelace",
-      "number": "39-44-5323523",
+      "number": "1212121212",
       "id": 2
     },
     {
@@ -21,24 +21,9 @@
       "id": 4
     },
     {
-      "name": "1212",
-      "number": "1212",
-      "id": 5
-    },
-    {
       "name": "testing name",
       "number": "1212121212",
       "id": 6
-    },
-    {
-      "name": "12121313",
-      "number": "1313",
-      "id": 8
-    },
-    {
-      "name": "12121212",
-      "number": "1212",
-      "id": 9
     },
     {
       "name": "435456",
@@ -51,9 +36,14 @@
       "id": 11
     },
     {
-      "name": "another ",
-      "number": "465654",
+      "name": "arto hellas",
+      "number": "12",
       "id": 12
+    },
+    {
+      "name": "hobknoker",
+      "number": "1231",
+      "id": 14
     }
   ]
 }
