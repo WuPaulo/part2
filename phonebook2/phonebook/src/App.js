@@ -13,6 +13,8 @@ const App = () => {
   const [nameFilter, setNameFilter] = useState("");
   const [filteredName, setFilteredName] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [notificationType, setNotificationType] = useState(null);
+
   // const [errorType, setErrorType] = useState(null);
 
   useEffect(() => {
@@ -30,13 +32,38 @@ const App = () => {
 
     if (!duplicate) {
       const personObj = { name: newName, number: newNumber };
-      getPersons.create(personObj).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-        setErrorMessage(`Added ${newName}`);
+
+      if (newName.length <= 3) {
+        setNotificationType("error");
+        setErrorMessage(`Name must be at least three characters long`);
         setTimeout(() => {
           setErrorMessage(null);
         }, 3000);
-      });
+      } else if (newNumber.length <= 8) {
+        setNotificationType("error");
+        setErrorMessage(`Number must be at least 8 digits long `);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 3000);
+      } else {
+        getPersons
+          .create(personObj)
+          .then((returnedPerson) => {
+            setPersons(persons.concat(returnedPerson));
+            setNotificationType("Success");
+            setErrorMessage(`Added ${newName}`);
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 3000);
+
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch((error) => {
+            setNotificationType("error");
+            setErrorMessage(`${error.response.data.error}`);
+          });
+      }
     } else if (duplicate) {
       if (
         window.confirm(
@@ -47,21 +74,22 @@ const App = () => {
           (person) => person.name.toLowerCase() === newName.toLowerCase()
         );
         const indexPerson = { ...index, number: newNumber };
-        console.log(index.id);
         getPersons
-          .update(index.id, indexPerson)
+          .update(index._id, indexPerson)
           .then((returnedPerson) => {
             setPersons(
               persons.map((person) =>
-                person.id !== index.id ? person : returnedPerson
+                person.id !== index._id ? person : returnedPerson
               )
             );
+            setNotificationType("success");
             setErrorMessage(`Changed ${newName}'s number`);
             setTimeout(() => {
               setErrorMessage(null);
             }, 3000);
           })
           .catch((error) => {
+            setNotificationType("error");
             setErrorMessage(
               `person '${persons.name}' was already removed from server`
             );
@@ -71,7 +99,6 @@ const App = () => {
           });
       }
     }
-
     setNewName("");
     setNewNumber("");
   };
@@ -96,12 +123,15 @@ const App = () => {
   const deleteClick = (personTobeDeleted) => {
     if (window.confirm(`Delete ${personTobeDeleted.name} ?`)) {
       getPersons
-        .deleteObjectById(personTobeDeleted.id)
+        .deleteObjectById(personTobeDeleted._id)
         .then(
           setPersons(
-            persons.filter((person) => person.id !== personTobeDeleted.id)
+            persons.filter(
+              (person) => person["_id"] !== personTobeDeleted["_id"]
+            )
           )
         );
+      setNotificationType("success");
       setErrorMessage(`Deleted ${newName} from phonebook`);
       setTimeout(() => {
         setErrorMessage(null);
@@ -112,7 +142,10 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} />
+      <Notification
+        notificationType={notificationType}
+        message={errorMessage}
+      />
       <Filter value={nameFilter} onChange={filterChange} />
       <h2>Add a New Person</h2>
       <Form
